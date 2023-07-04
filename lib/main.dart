@@ -1,49 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/riverpod.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+// 定義したProvider(グローバル)
+final titleProvider = StateProvider((ref) => "タイトル");
+final counterProvider = StateProvider((ref) => 0);
+
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: MyHomePage(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
+class MyHomePage extends ConsumerWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+  // ConsumerWidgetを継承する時refを引数で受け取る
+  // refにアクセスする事で定義したProviderにアクセスが可能
+  Widget build(BuildContext context, WidgetRef ref) {
+    // watchで定義したProviderの値を監視
+    final int counter = ref.watch(counterProvider);
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+    void _incrementCounter() {
+      // notifierでデータを更新
+      final notifier = ref.read(counterProvider.notifier);
+      notifier.state++;
+    }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        // watchで変更を監視
+        title: Text(ref.watch(titleProvider)),
       ),
       body: Center(
         child: Column(
@@ -53,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              counter.toString(),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
