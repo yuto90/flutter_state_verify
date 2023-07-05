@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/riverpod.dart';
 
 void main() {
   // 状態管理をスコープを設定するためにWidgetツリーの最上位にProviderScopeを配置
