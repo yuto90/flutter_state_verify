@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_state_verify/model/todo.dart';
-import 'package:flutter_state_verify/provider/provider.dart';
+import 'package:flutter_state_verify/provider/count_provider.dart';
+import 'package:flutter_state_verify/provider/title_provider.dart';
 
 void main() {
   // 状態管理をスコープを設定するためにWidgetツリーの最上位にProviderScopeを配置
@@ -24,14 +25,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// Widgetを部分更新する場合はConsumerを使わずStatelessWidgetを使う
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // ConsumerでWidgetを部分更新
         title: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          return Text(ref.watch(titleProvider));
+          print("タイトルビルド");
+          return Text(ref.watch(titleNotifierProvider));
         }),
       ),
       body: SingleChildScrollView(
@@ -41,43 +45,19 @@ class MyHomePage extends StatelessWidget {
             children: <Widget>[
               Consumer(builder:
                   (BuildContext context, WidgetRef ref, Widget? child) {
+                print("カウンタービルド");
                 return Text(
-                  ref.watch(counterProvider).toString(),
+                  ref.watch(countNotifierProvider).toString(),
                   style: Theme.of(context).textTheme.headlineMedium,
                 );
               }),
               Consumer(builder:
                   (BuildContext context, WidgetRef ref, Widget? child) {
-                final List<Todo> todoList = ref.watch(todoListProvider);
-                return ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    for (final todo in todoList)
-                      ListTile(
-                        title: Text(todo.title),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            ref
-                                .read(todoListProvider.notifier)
-                                .removeTodo(todo.id);
-                          },
-                        ),
-                      ),
-                  ],
-                );
-              }),
-              Consumer(builder:
-                  (BuildContext context, WidgetRef ref, Widget? child) {
                 return ElevatedButton(
-                  onPressed: () => ref.read(todoListProvider.notifier).addTodo(
-                        Todo(id: "10", title: "メモ10"),
-                      ),
-                  child: const Text("Todoを追加"),
+                  onPressed: () => ref
+                      .read(titleNotifierProvider.notifier)
+                      .changeTitle("タイトルが変わった"),
+                  child: const Text("タイトルを変更"),
                 );
               })
             ],
@@ -88,7 +68,7 @@ class MyHomePage extends StatelessWidget {
           builder: (BuildContext context, WidgetRef ref, Widget? child) {
         return FloatingActionButton(
           onPressed: () =>
-              ref.read(counterProvider.notifier).incrementCounter(),
+              ref.read(countNotifierProvider.notifier).incrementCounter(),
           tooltip: 'Increment',
           child: const Icon(Icons.add),
         );
