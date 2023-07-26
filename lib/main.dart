@@ -26,53 +26,36 @@ class MyApp extends StatelessWidget {
 }
 
 // Widgetを部分更新する場合はConsumerを使わずStatelessWidgetを使う
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        // ConsumerでWidgetを部分更新
-        title: Consumer(
-            builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          print("タイトルビルド");
-          return Text(ref.watch(titleNotifierProvider));
-        }),
-      ),
+      appBar: AppBar(title: Text(ref.watch(titleNotifierProvider))),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Consumer(builder:
-                  (BuildContext context, WidgetRef ref, Widget? child) {
-                print("カウンタービルド");
-                return Text(
-                  ref.watch(countNotifierProvider).toString(),
-                  style: Theme.of(context).textTheme.headlineMedium,
-                );
-              }),
-              Consumer(builder:
-                  (BuildContext context, WidgetRef ref, Widget? child) {
-                return ElevatedButton(
-                  onPressed: () => ref
-                      .read(titleNotifierProvider.notifier)
-                      .changeTitle("タイトルが変わった"),
-                  child: const Text("タイトルを変更"),
-                );
-              })
+              Text(
+                ref.watch(countNotifierProvider).toString(),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              ElevatedButton(
+                onPressed: () => ref
+                    .read(titleNotifierProvider.notifier)
+                    .changeTitle("タイトルが変わった"),
+                child: const Text("タイトルを変更"),
+              )
             ],
           ),
         ),
       ),
-      floatingActionButton: Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        return FloatingActionButton(
-          onPressed: () =>
-              ref.read(countNotifierProvider.notifier).incrementCounter(),
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        );
-      }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            ref.read(countNotifierProvider.notifier).incrementCounter(),
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

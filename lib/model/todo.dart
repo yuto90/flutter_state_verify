@@ -1,9 +1,11 @@
-// todoを管理するクラス
-class Todo {
-  final String id;
-  final String title;
-  final bool isDone;
+import 'package:freezed_annotation/freezed_annotation.dart';
+part 'todo.freezed.dart';
 
-  // コンストラクタ
-  Todo({required this.id, required this.title, this.isDone = false});
+@freezed
+class Todo with _$Todo {
+  const factory Todo({
+    required int id,
+    required String content,
+    required bool completed,
+  }) = _Todo;
 }
